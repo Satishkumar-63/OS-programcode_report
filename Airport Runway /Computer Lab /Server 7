@@ -1,0 +1,12 @@
+#include <stdio.h>
+int main()
+{ int n;
+printf("Enter number of drones: "); scanf("%d", &n); float distance[n];
+// Enter distances for (int i = 0; i < n; i++)
+{ printf("Enter distance of Drone-%d: ", i + 1);
+scanf("%f", &distance[i]);
+} printf("\nDRONE WORK ASSIGNMENT - FCFS\n\n");
+// Assign work according to FCFS for (int work = 1; work <= n; work++)
+{ printf("Work-%d -> Drone-%d | Distance = %.2f\n", work, work, distance[work - 1]); }
+return 0;
+}
