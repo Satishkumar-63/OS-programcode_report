@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h> #include <unistd.h>
+// Global mutex locks
+pthread_mutex_t l1 = PTHREAD_MUTEX_INITIALIZER; pthread_mutex_t l2 = PTHREAD_MUTEX_INITIALIZER;
+// Global variable to store user-defined sleep duration (in seconds) int delay_sec = 1;
+void* t1(void* a) { pthread_mutex_lock(&l1);
+printf("[Thread 1] Acquired Lock 1. Waiting %d second(s)...\n", delay_sec); sleep(delay_sec);
+printf("[Thread 1] Trying to acquire Lock 2...\n"); pthread_mutex_lock(&l2); // Deadlock point: t2 holds l2
+printf("[Thread 1] Acquired Lock 2!\n"); pthread_mutex_unlock(&l2); pthread_mutex_unlock(&l1);
+return NULL;
+}
+void* t2(void* a) { pthread_mutex_lock(&l2); printf("[Thread 2] Acquired Lock 2. Waiting %d second(s)...\n", delay_sec); sleep(delay_sec);
+printf("[Thread 2] Trying to acquire Lock 1...\n"); pthread_mutex_lock(&l1); // Deadlock point: t1 holds l1
+printf("[Thread 2] Acquired Lock 1!\n"); pthread_mutex_unlock(&l1); pthread_mutex_unlock(&l2);
+return NULL;
+}
+int main() {
+pthread_t a, b;
+printf("Enter lock hold delay in seconds (e.g., 1 or 2): "); if (scanf("%d", &delay_sec) != 1 || delay_sec < 0) { printf("Invalid input. Defaulting to 1 second.\n");
+delay_sec = 1;
+}
+// Create threads pthread_create(&a, NULL, t1, NULL); pthread_create(&b, NULL, t2, NULL);
+printf("\nDeadlock triggered! System hanging...\n"); printf("(Press Ctrl+C in terminal to exit program)\n\n");
+// Wait for threads (will hang indefinitely due to circular wait) pthread_join(a, NULL); pthread_join(b, NULL);
+// Clean up locks (unreachable code due to deadlock)
+pthread_mutex_destroy(&l1); pthread_mutex_destroy(&l2);
+return 0;
+}
