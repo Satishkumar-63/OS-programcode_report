@@ -1,0 +1,11 @@
+#include <stdio.h> 
+int main(){ 
+ int b[]={100,500,200,300,600},p[]={212,417,112,426},i,j,k; 
+ for(i=0;i<4;i++){ 
+  k=-1; 
+  for(j=0;j<5;j++) 
+   if(b[j]>=p[i]&&(k<0||b[j]>b[k])) k=j; 
+  if(k>=0){printf("M%d -> B%d\n",i+1,k+1);b[k]-=p[i];} 
+  else printf("M%d -> Not Allocated\n",i+1); 
+ } 
+} 
