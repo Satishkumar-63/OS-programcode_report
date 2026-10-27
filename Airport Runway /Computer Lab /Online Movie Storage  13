@@ -1,0 +1,11 @@
+#include <stdio.h> 
+int main(){ 
+	int start,n,i; 
+	printf("Enter start block and number of blocks: "); 
+	scanf("%d%d",&start,&n); 
+	printf("Movie blocks: "); 
+	for(i=0;i<n;i++) 
+    	printf("%d ",start+i); 
+	printf("\nMovie stored successfully.\n"); 
+	return 0; 
+} 
