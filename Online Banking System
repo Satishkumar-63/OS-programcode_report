@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+int balance = 1000;
+int readers = 0;
+
+pthread_mutex_t mutex;
+sem_t writeLock;
+
+void *reader(void *arg)
+{
+    pthread_mutex_lock(&mutex);
+    readers++;
+
+    if (readers == 1)
+        sem_wait(&writeLock);
+
+    pthread_mutex_unlock(&mutex);
+
+    printf("Reader %d: Balance = %d\n", *(int *)arg, balance);
+
+    pthread_mutex_lock(&mutex);
+    readers--;
+
+    if (readers == 0)
+        sem_post(&writeLock);
+
+    pthread_mutex_unlock(&mutex);
+
+    return NULL;
+}
+
+void *writer(void *arg)
+{
+    sem_wait(&writeLock);
+
+    balance += 500;
+    printf("Writer: Deposited ₹500, New Balance = %d\n", balance);
+
+    sem_post(&writeLock);
+
+    return NULL;
+}
+
+int main()
+{
+    pthread_t r[3], w;
+    int id[3] = {1, 2, 3};
+
+    pthread_mutex_init(&mutex, NULL);
+    sem_init(&writeLock, 0, 1);
+
+    for (int i = 0; i < 3; i++)
+        pthread_create(&r[i], NULL, reader, &id[i]);
+
+    pthread_create(&w, NULL, writer, NULL);
+
+    for (int i = 0; i < 3; i++)
+        pthread_join(r[i], NULL);
+
+    pthread_join(w, NULL);
+
+    pthread_mutex_destroy(&mutex);
+    sem_destroy(&writeLock);
+
+    return 0;
