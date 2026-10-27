@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <pthread.h>
+
+typedef struct {
+    int count;
+    pthread_mutex_t lock;
+} Monitor;
+
+Monitor mon = {0, PTHREAD_MUTEX_INITIALIZER};
+
+void monitor_increment()
+{
+    pthread_mutex_lock(&mon.lock);
+
+    mon.count++;
+    printf("Count: %d\n", mon.count);
+
+    pthread_mutex_unlock(&mon.lock);
+}
+
+void *worker(void *arg)
+{
+    monitor_increment();
+    return NULL;
+}
+
+int main()
+{
+    pthread_t t1, t2;
+
+    pthread_create(&t1, NULL, worker, NULL);
+    pthread_create(&t2, NULL, worker, NULL);
+
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+
+    return 0;
